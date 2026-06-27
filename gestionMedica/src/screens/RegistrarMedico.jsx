@@ -215,11 +215,11 @@ const RegistrarMedico = () => {
 const styles = {
   container: {
     backgroundColor: '#F2F4F7',
-    minHeight: '100vh', // 👈 para evitar cortes
+    minHeight: '100vh', 
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'flex-start', // 👈 alinea arriba
-    paddingTop: '3rem', // 👈 espacio superior
+    alignItems: 'flex-start', 
+    paddingTop: '3rem', 
     fontFamily: 'Poppins, sans-serif'
   },
   card: {
