@@ -47,6 +47,7 @@ const defaultMethods = (endpoint) => ({
   getAll: async () => {
     try {
       const res = await customAxios.get(`/${endpoint}/all`);
+      // console.log(`📦 Datos obtenidos de /${endpoint}/all:`, res.data);
       return res.data;
     } catch (error) {
       handleError(error);

@@ -5,14 +5,15 @@ const API_URL = "http://localhost:5000/api/auth"; // Ajustado al puerto 5000
 
 const login = async (correo, contrasena) => {
   try {
-    // Se mapea correo -> email, contrasena -> password para el backend
     const res = await axios.post(`${API_URL}/login`, {
       email: correo,
       password: contrasena,
     });
 
-    // El backend retorna { user, token }
-    const { token, user } = res.data; 
+    console.log("=== ESTRUCTURA RECIBIDA DE LA API ===", res.data);
+
+    // CAMBIAR ESTA LÍNEA (agregando .data al final):
+    const { token, user } = res.data.data; 
     
     if (!user) {
       throw new Error("No se recibió información de usuario");
@@ -38,7 +39,6 @@ const login = async (correo, contrasena) => {
     }));
 
   } catch (err) {
-    // Captura el mensaje de error estructurado del backend si existe
     const errMsg = err.response?.data?.message || err.message;
     console.error("Error al iniciar sesión:", errMsg);
     throw new Error(errMsg);
