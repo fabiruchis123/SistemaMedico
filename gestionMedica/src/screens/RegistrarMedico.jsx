@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import Button from '../components/Button'
 import Card from '../components/Card'
 import Sidebar from '../components/Sidebar'
+import { medicosAPI } from "../connections/api";
+
 
 const navItems = [
   { id: 'home', label: 'Inicio', icon: <span>🏠</span> },
@@ -34,7 +36,26 @@ const RegistrarMedico = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    alert('✅ Médico registrado con éxito')
+    medicosAPI.create(formData)
+      .then(() => {
+        alert('✅ Médico registrado con éxito')
+        setFormData({
+          nombre: '',
+          apellido: '',
+          especialidad: '',
+          numeroColegiacion: '',
+          correo: '',
+          telefono: '',
+          consultorio: '',
+          direccion: '',
+          horario: '',
+          estado: 'Activo'
+        })
+      })
+      .catch((error) => {
+        console.error('Error al registrar médico:', error)
+        alert('❌ Error al registrar médico')
+      })
   }
 
   return (
@@ -201,8 +222,8 @@ const RegistrarMedico = () => {
                 <button type="button" style={styles.cancelButton}>
                   Cancelar
                 </button>
-                <button type="submit" style={styles.saveButton}>
-                  Guardar médico
+               <button type="submit" onClick={handleSubmit}>
+              Guardar médico
                 </button>
               </div>
             </form>

@@ -176,3 +176,6 @@ export const familiasAPI = createApiMethods("familias", {
     }
   },
 });
+
+export const medicosAPI = createApiMethods("medicos", {
+})
