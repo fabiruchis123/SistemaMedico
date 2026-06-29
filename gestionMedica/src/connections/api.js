@@ -105,6 +105,7 @@ const createApiMethods = (endpoint, extraMethods = {}) => {
 // Servicio de Pacientes (Añadido)
 // Esto mapea automáticamente a /pacientes/all, /pacientes/id/:id, etc.
 export const pacientesAPI = createApiMethods("pacientes");
+export const doctoresAPI = createApiMethods("doctores");
 
 export const productosAPI = createApiMethods("productos", {
   update: async (data) => {
