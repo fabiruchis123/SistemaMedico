@@ -1,10 +1,12 @@
+// api.js
 import axios from "axios";
 
 // ==========================================
 // 1. CONFIGURACIÓN DE AXIOS E INTERCEPTOR
 // ==========================================
 
-const BASE_URL = "http://localhost:4000/api";
+// Ajustado al puerto 5000 donde corre su API
+const BASE_URL = "http://localhost:5000/api";
 
 const customAxios = axios.create({
   baseURL: BASE_URL,
@@ -13,7 +15,7 @@ const customAxios = axios.create({
 // Interceptor para agregar token automáticamente en cada petición
 customAxios.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token"); // o sessionStorage / cookies
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,7 +36,6 @@ const handleError = (error) => {
     "Error desconocido";
 
   console.error("Detalles del error:", error.response?.data);
-
   throw new Error("Error al conectar con la API: " + apiMessage);
 };
 
@@ -99,6 +100,10 @@ const createApiMethods = (endpoint, extraMethods = {}) => {
 // ==========================================
 // 4. EXPORTACIÓN DE SERVICIOS CRUD INDIVIDUALES
 // ==========================================
+
+// Servicio de Pacientes (Añadido)
+// Esto mapea automáticamente a /pacientes/all, /pacientes/id/:id, etc.
+export const pacientesAPI = createApiMethods("pacientes");
 
 export const productosAPI = createApiMethods("productos", {
   update: async (data) => {
