@@ -1,48 +1,79 @@
+// sesion.js
 import axios from "axios";
 
-const login = async (correo, contrasena) => {
+const API_URL = import.meta.env.VITE_API_URL_Auth || "http://localhost:5000/api/auth";
+
+const inferRole = (email) => {
+  if (!email) return "secretario";
+  if (email.includes("admin")) return "admin";
+  if (email.includes("doctor") || email.includes("medico")) return "doctor";
+  return "secretario";
+};
+
+const login = async (email, password) => {
   try {
-    const res = await axios.post("http://localhost:4000/api/auth/login", {
-      correo,
-      contrasena,
+    const res = await axios.post(`${API_URL}/login`, {
+      email,
+      password,
     });
 
-    const { token, usuario } = res.data;
-    const { id, nombre } = usuario;
-    if (!usuario) {
+    console.log("=== ESTRUCTURA RECIBIDA DE LA API ===", res.data);
+
+    const { token, user } = res.data.data;
+
+    if (!user) {
       throw new Error("No se recibió información de usuario");
     }
-    if (!id) {
+
+    const { usuario_id, nombre_usuario, email: userEmail } = user;
+
+    if (!usuario_id) {
       throw new Error("No se recibió el ID del usuario");
     }
     if (!token) {
       throw new Error("No se recibió un token de autenticación");
-    } else {
-      localStorage.setItem("token", token); // ahora se usará en todas las peticiones
-      localStorage.setItem("idUsuario", id);
-      localStorage.setItem("nombreUsuario", nombre || "");
-      localStorage.setItem("userData", JSON.stringify({ username: correo, nombre: nombre || correo }));
     }
+
+    const normalizedUser = {
+      id: usuario_id,
+      nombre: nombre_usuario || userEmail || email,
+      email: userEmail || email,
+      role: inferRole(userEmail || email),
+      token,
+      ...user,
+    };
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("idUsuario", usuario_id);
+    localStorage.setItem("nombreUsuario", normalizedUser.nombre || "");
+    localStorage.setItem("userData", JSON.stringify(normalizedUser));
+
+    return normalizedUser;
   } catch (err) {
-    console.error("Error al iniciar sesión", err.message);
-    throw err;
+    const errMsg = err.response?.data?.message || err.message;
+    console.error("Error al iniciar sesión:", errMsg);
+    throw new Error(errMsg);
   }
 };
 
 const logout = async () => {
+  const idUsuario = localStorage.getItem("idUsuario");
   localStorage.removeItem("token");
-  if (!localStorage.getItem("idUsuario")) {
+  localStorage.removeItem("idUsuario");
+  localStorage.removeItem("nombreUsuario");
+  localStorage.removeItem("userData");
+
+  if (!idUsuario) {
     console.warn("No se encontró un usuario autenticado para cerrar sesión");
     return;
   }
-  axios.post("https://apiintegrador-production-8ef8.up.railway.app/api/auth/logout", {id: localStorage.getItem("idUsuario")})
+  axios.post(`${API_URL}/logout`, { id: idUsuario })
     .then((response) => {
       console.log("Sesión cerrada correctamente", response.data);
     })
     .catch((error) => {
       console.error("Error al cerrar sesión", error);
     });
-  localStorage.removeItem("idUsuario");
 };
 
 export default { login, logout };

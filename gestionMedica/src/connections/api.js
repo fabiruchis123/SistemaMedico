@@ -1,10 +1,12 @@
+// api.js
 import axios from "axios";
 
 // ==========================================
 // 1. CONFIGURACIÓN DE AXIOS E INTERCEPTOR
 // ==========================================
 
-const BASE_URL = "http://localhost:4000/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 
 const customAxios = axios.create({
   baseURL: BASE_URL,
@@ -13,7 +15,7 @@ const customAxios = axios.create({
 // Interceptor para agregar token automáticamente en cada petición
 customAxios.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token"); // o sessionStorage / cookies
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,7 +36,6 @@ const handleError = (error) => {
     "Error desconocido";
 
   console.error("Detalles del error:", error.response?.data);
-
   throw new Error("Error al conectar con la API: " + apiMessage);
 };
 
@@ -46,6 +47,7 @@ const defaultMethods = (endpoint) => ({
   getAll: async () => {
     try {
       const res = await customAxios.get(`/${endpoint}/all`);
+      // console.log(`📦 Datos obtenidos de /${endpoint}/all:`, res.data);
       return res.data;
     } catch (error) {
       handleError(error);
@@ -54,7 +56,7 @@ const defaultMethods = (endpoint) => ({
 
   getById: async (id) => {
     try {
-      const res = await customAxios.get(`/${endpoint}/id/${id}`);
+      const res = await customAxios.get(`/${endpoint}/${id}`);
       return res.data;
     } catch (error) {
       handleError(error);
@@ -81,7 +83,7 @@ const defaultMethods = (endpoint) => ({
 
   remove: async (id) => {
     try {
-      const res = await customAxios.delete(`/${endpoint}/id/${id}`);
+      const res = await customAxios.delete(`/${endpoint}/${id}`);
       return res.data;
     } catch (error) {
       handleError(error);
@@ -100,82 +102,14 @@ const createApiMethods = (endpoint, extraMethods = {}) => {
 // 4. EXPORTACIÓN DE SERVICIOS CRUD INDIVIDUALES
 // ==========================================
 
-export const productosAPI = createApiMethods("productos", {
-  update: async (data) => {
-    try {
-      const res = await customAxios.put(`/productos`, data);
-      return res.data;
-    } catch (error) {
-      handleError(error);
-    }
-  },
-  getByFamilia: async (codigoFamilia) => {
-    try {
-      const url = `/productos/consulta/ProductosPorFamilia/${encodeURIComponent(codigoFamilia)}`;
-      console.log("Llamando a:", url);
-      const res = await customAxios.get(url);
-      return res.data;
-    } catch (error) {
-      handleError(error);
-    }
-  },
-  getByUsuario: async (idUsuario) => {
-    try {
-      const url = `/productos/consulta/porUsuario/${encodeURIComponent(idUsuario)}`;
-      console.log("📦 Consultando productos por usuario:", url);
-      const res = await customAxios.get(url);
-      return res.data;
-    } catch (error) {
-      handleError(error);
-    }
-  }
-});
 
-export const familiasAPI = createApiMethods("familias", {
-  getById: async (identificacion) => {
-    try {
-      const res = await customAxios.get(
-        `/familias/consulta/familiaConJefe/${encodeURIComponent(identificacion)}`
-      );
-      return res.data;
-    } catch (error) {
-      handleError(error);
-    }
-  },
+// Esto mapea automáticamente a /pacientes/all, /pacientes/id/:id, etc.
 
-  egresar: async (payload) => {
-    try {
-      const data = {
-        id: payload.id,
-        idModificacion: Number(payload.idModificacion)
-      };
-      const res = await customAxios.put(`/familias/egreso`, data);
-      return res.data;
-    } catch (error) {
-      handleError(error);
-    }
-  },
 
-  getNextNumero: async (canton) => {
-    try {
-      const res = await customAxios.get(
-        `/familias/requerimiento/indentificador/${encodeURIComponent(canton)}`
-      );
-      return res.data.identificador;
-    } catch (error) {
-      handleError(error);
-    }
-  },
+export const pacientesAPI = createApiMethods("pacientes");
 
-  getByUsuario: async (idUsuario) => {
-    try {
-      const res = await customAxios.get(`/familias/consulta/porUsuario/${encodeURIComponent(idUsuario)}`);
-      return res.data;
-    } catch (error) {
-      handleError(error);
-    }
-  },
-});
+export const doctoresAPI = createApiMethods("doctores");
 
-export const medicosAPI = createApiMethods("medicos", {
-})
+export const citasAPI = createApiMethods("citas");
+
+export { customAxios, createApiMethods };

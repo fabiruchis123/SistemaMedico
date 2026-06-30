@@ -1,0 +1,1 @@
+export { useMedicos } from './useMedicos'
