@@ -1,15 +1,21 @@
 import React, { useState } from 'react'
-import Input from '../components/Input'
-import Button from '../components/Button'
-import Card from '../components/Card'
+import { useNavigate } from 'react-router-dom'
+import { C, T } from '../theme'
+import { Input, Button, Card, Alert } from '../components'
+import { useAuth } from '../context/AuthContext'
+import session from '../connections/session'
 
 const Login = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('admin@clinica.com')
+  const [password, setPassword] = useState('admin123')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const { login } = useAuth()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
 
     if (!email || !password) {
       setError('Por favor completa todos los campos.')
@@ -26,8 +32,17 @@ const Login = () => {
       return
     }
 
-    setError('')
-    alert('Inicio de sesión simulado ✅')
+    setLoading(true)
+    try {
+      await session.login(email, password)
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}')
+      login(userData)
+      navigate('/home')
+    } catch (err) {
+      setError(err.message || 'No se pudo iniciar sesión. Verifica tus credenciales.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -56,6 +71,7 @@ const Login = () => {
               placeholder="ejemplo@correo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
             />
             <Input
               label="Contraseña"
@@ -63,18 +79,23 @@ const Login = () => {
               placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
 
             <div style={styles.forgotContainer}>
               <a href="#" style={styles.forgot}>¿Olvidaste tu contraseña?</a>
             </div>
 
-            {/* Botón azul ajustado */}
-            <button type="submit" style={styles.button}>
-              Iniciar sesión
-            </button>
+            <Button 
+              type="submit" 
+              variant="primary" 
+              style={styles.button}
+              disabled={loading}
+            >
+              {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+            </Button>
 
-            {error && <p style={styles.error}>{error}</p>}
+            {error && <Alert type="error" message={error} />}
 
             <p style={styles.register}>
               ¿No tienes cuenta? <a href="#" style={styles.link}>Regístrate aquí</a>
@@ -90,12 +111,12 @@ const styles = {
   container: {
     display: 'flex',
     height: '100vh',
-    fontFamily: 'Poppins, sans-serif',
-    backgroundColor: '#F2F4F7'
+    fontFamily: T.family,
+    backgroundColor: C.grayLight
   },
   left: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -103,20 +124,20 @@ const styles = {
     padding: '2rem'
   },
   logo: {
-    color: '#2F80ED',
-    fontWeight: 'bold',
-    fontSize: '2rem',
+    color: C.medicalBlue,
+    fontWeight: T.weight.bold,
+    fontSize: T.size.h1,
     marginBottom: '0.5rem'
   },
   title: {
-    color: '#333333',
-    fontWeight: '600',
-    fontSize: '1.1rem',
+    color: C.grayDark,
+    fontWeight: T.weight.semibold,
+    fontSize: T.size.lg,
     marginBottom: '0.5rem'
   },
   text: {
-    color: '#828282',
-    fontSize: '0.9rem',
+    color: C.grayMid,
+    fontSize: T.size.base,
     textAlign: 'center',
     maxWidth: '300px',
     marginBottom: '1.5rem'
@@ -127,13 +148,13 @@ const styles = {
   },
   right: {
     flex: 1,
-    backgroundColor: '#F2F4F7',
+    backgroundColor: C.grayLight,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     padding: '2.5rem',
     borderRadius: '12px',
     boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
@@ -141,10 +162,11 @@ const styles = {
     textAlign: 'left'
   },
   formTitle: {
-    color: '#333333',
-    fontWeight: '600',
+    color: C.grayDark,
+    fontWeight: T.weight.semibold,
     marginBottom: '1rem',
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: T.size.h3
   },
   form: {
     display: 'flex',
@@ -156,40 +178,29 @@ const styles = {
     marginTop: '-0.5rem'
   },
   forgot: {
-    color: '#2F80ED',
-    fontSize: '0.85rem',
+    color: C.medicalBlue,
+    fontSize: T.size.sm,
     textDecoration: 'none'
   },
   button: {
-    backgroundColor: '#2F80ED',
-    color: '#FFFFFF',
-    fontWeight: '500',
-    borderRadius: '8px',
-    padding: '0.9rem', 
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '1rem', 
-    width: '100%',
     marginTop: '0.5rem',
-    textAlign: 'center',
-    transition: 'background-color 0.3s ease'
   },
   error: {
-    color: '#EB5757',
-    fontSize: '0.85rem',
+    color: C.alertRed,
+    fontSize: T.size.sm,
     marginTop: '1rem',
     textAlign: 'center'
   },
   register: {
     marginTop: '1rem',
-    fontSize: '0.85rem',
-    color: '#828282',
+    fontSize: T.size.sm,
+    color: C.grayMid,
     textAlign: 'center'
   },
   link: {
-    color: '#2F80ED',
+    color: C.medicalBlue,
     textDecoration: 'none',
-    fontWeight: '500'
+    fontWeight: T.weight.medium
   }
 }
 

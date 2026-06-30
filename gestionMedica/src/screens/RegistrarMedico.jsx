@@ -1,15 +1,7 @@
 import React, { useState } from 'react'
-import Button from '../components/Button'
-import Card from '../components/Card'
-import Sidebar from '../components/Sidebar'
-
-const navItems = [
-  { id: 'home', label: 'Inicio', icon: <span>🏠</span> },
-  { id: 'medicos', label: 'Médicos', icon: <span>👨‍⚕️</span> },
-  { id: 'pacientes', label: 'Pacientes', icon: <span>🧑‍🤝‍🧑</span> },
-  { id: 'citas', label: 'Citas', icon: <span>📅</span>, badge: 3 },
-  { id: 'registrar-medico', label: 'Registrar médico', icon: <span>➕</span> },
-]
+import { C, T } from '../theme'
+import { Button, Card, Input, Select } from '../components'
+import MainLayout from '../layouts/MainLayout'
 
 const RegistrarMedico = () => {
   const [formData, setFormData] = useState({
@@ -25,8 +17,6 @@ const RegistrarMedico = () => {
     estado: 'Activo'
   })
 
-  const [active, setActive] = useState('registrar-medico')
-
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
@@ -37,214 +27,203 @@ const RegistrarMedico = () => {
     alert('✅ Médico registrado con éxito')
   }
 
+  const specialtiesOptions = [
+    { value: '', label: 'Seleccionar especialidad' },
+    { value: 'Cardiología', label: 'Cardiología' },
+    { value: 'Pediatría', label: 'Pediatría' },
+    { value: 'Dermatología', label: 'Dermatología' },
+    { value: 'Neurología', label: 'Neurología' }
+  ]
+
+  const scheduleOptions = [
+    { value: '', label: 'Seleccionar horario' },
+    { value: 'Mañana', label: 'Mañana' },
+    { value: 'Tarde', label: 'Tarde' },
+    { value: 'Noche', label: 'Noche' }
+  ]
+
+  const statusOptions = [
+    { value: 'Activo', label: 'Activo' },
+    { value: 'Inactivo', label: 'Inactivo' }
+  ]
+
   return (
-    <div style={{ display: 'flex' }}>
-      {/* Sidebar */}
-      <Sidebar
-        items={navItems}
-        activeId={active}
-        onSelect={setActive}
-        user={{ name: 'Dra. García', role: 'Médico General' }}
-        appName="MediGestión"
-        onLogout={() => alert('Sesión cerrada')}
-      />
+    <MainLayout pageTitle="Registrar nuevo médico">
+      <div style={styles.container}>
+        <Card style={styles.card}>
+          <h2 style={styles.title}>Registrar nuevo médico</h2>
+          <p style={styles.subtitle}>
+            Completa la información para registrar al médico en el sistema.
+          </p>
 
-      {/* Contenido principal */}
-      <div style={{ flex: 1 }}>
-        <div style={styles.container}>
-          <Card style={styles.card}>
-            <h2 style={styles.title}>Registrar nuevo médico</h2>
-            <p style={styles.subtitle}>
-              Completa la información para registrar al médico en el sistema.
-            </p>
-
-            <form style={styles.form} onSubmit={handleSubmit}>
-              {/* Información personal */}
-              <h3 style={styles.sectionTitle}>Información personal</h3>
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Nombres</label>
-                  <input
-                    type="text"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    style={styles.input}
-                    placeholder="Ej. Juan Carlos"
-                  />
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Apellidos</label>
-                  <input
-                    type="text"
-                    name="apellido"
-                    value={formData.apellido}
-                    onChange={handleChange}
-                    style={styles.input}
-                    placeholder="Ej. Pérez Gómez"
-                  />
-                </div>
+          <form style={styles.form} onSubmit={handleSubmit}>
+            {/* Información personal */}
+            <h3 style={styles.sectionTitle}>Información personal</h3>
+            <div style={styles.row}>
+              <div style={styles.inputGroup}>
+                <Input
+                  label="Nombres"
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  placeholder="Ej. Juan Carlos"
+                />
               </div>
-
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Especialidad</label>
-                  <select
-                    name="especialidad"
-                    value={formData.especialidad}
-                    onChange={handleChange}
-                    style={styles.select}
-                  >
-                    <option value="">Seleccionar especialidad</option>
-                    <option value="Cardiología">Cardiología</option>
-                    <option value="Pediatría">Pediatría</option>
-                    <option value="Dermatología">Dermatología</option>
-                    <option value="Neurología">Neurología</option>
-                  </select>
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Número de colegiado</label>
-                  <input
-                    type="text"
-                    name="numeroColegiacion"
-                    value={formData.numeroColegiacion}
-                    onChange={handleChange}
-                    style={styles.input}
-                    placeholder="Ej. 12345"
-                  />
-                </div>
+              <div style={styles.inputGroup}>
+                <Input
+                  label="Apellidos"
+                  type="text"
+                  name="apellido"
+                  value={formData.apellido}
+                  onChange={handleChange}
+                  placeholder="Ej. Pérez Gómez"
+                />
               </div>
+            </div>
 
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Teléfono</label>
-                  <input
-                    type="tel"
-                    name="telefono"
-                    value={formData.telefono}
-                    onChange={handleChange}
-                    style={styles.input}
-                    placeholder="Ej. +503 7123 4567"
-                  />
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Correo electrónico</label>
-                  <input
-                    type="email"
-                    name="correo"
-                    value={formData.correo}
-                    onChange={handleChange}
-                    style={styles.input}
-                    placeholder="Ej. juanperez@gmail.com"
-                  />
-                </div>
+            <div style={styles.row}>
+              <div style={styles.inputGroup}>
+                <Select
+                  label="Especialidad"
+                  name="especialidad"
+                  value={formData.especialidad}
+                  onChange={handleChange}
+                  options={specialtiesOptions}
+                />
               </div>
+              <div style={styles.inputGroup}>
+                <Input
+                  label="Número de colegiado"
+                  type="text"
+                  name="numeroColegiacion"
+                  value={formData.numeroColegiacion}
+                  onChange={handleChange}
+                  placeholder="Ej. 12345"
+                />
+              </div>
+            </div>
 
-              {/* Información profesional */}
-              <h3 style={styles.sectionTitle}>Información profesional</h3>
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Consultorio / Clínica</label>
-                  <input
-                    type="text"
-                    name="consultorio"
-                    value={formData.consultorio}
-                    onChange={handleChange}
-                    style={styles.input}
-                    placeholder="Ej. Clínica Médica San Benito"
-                  />
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Dirección</label>
-                  <input
-                    type="text"
-                    name="direccion"
-                    value={formData.direccion}
-                    onChange={handleChange}
-                    style={styles.input}
-                    placeholder="Ej. Av. La Capilla #123, San Salvador"
-                  />
-                </div>
+            <div style={styles.row}>
+              <div style={styles.inputGroup}>
+                <Input
+                  label="Teléfono"
+                  type="tel"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  placeholder="Ej. +503 7123 4567"
+                />
               </div>
+              <div style={styles.inputGroup}>
+                <Input
+                  label="Correo electrónico"
+                  type="email"
+                  name="correo"
+                  value={formData.correo}
+                  onChange={handleChange}
+                  placeholder="Ej. juanperez@gmail.com"
+                />
+              </div>
+            </div>
 
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Horario de atención</label>
-                  <select
-                    name="horario"
-                    value={formData.horario}
-                    onChange={handleChange}
-                    style={styles.select}
-                  >
-                    <option value="">Seleccionar horario</option>
-                    <option value="Mañana">Mañana</option>
-                    <option value="Tarde">Tarde</option>
-                    <option value="Noche">Noche</option>
-                  </select>
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Estado</label>
-                  <select
-                    name="estado"
-                    value={formData.estado}
-                    onChange={handleChange}
-                    style={styles.select}
-                  >
-                    <option value="Activo">Activo</option>
-                    <option value="Inactivo">Inactivo</option>
-                  </select>
-                </div>
+            {/* Información profesional */}
+            <h3 style={styles.sectionTitle}>Información profesional</h3>
+            <div style={styles.row}>
+              <div style={styles.inputGroup}>
+                <Input
+                  label="Consultorio / Clínica"
+                  type="text"
+                  name="consultorio"
+                  value={formData.consultorio}
+                  onChange={handleChange}
+                  placeholder="Ej. Clínica Médica San Benito"
+                />
               </div>
+              <div style={styles.inputGroup}>
+                <Input
+                  label="Dirección"
+                  type="text"
+                  name="direccion"
+                  value={formData.direccion}
+                  onChange={handleChange}
+                  placeholder="Ej. Av. La Capilla #123, San Salvador"
+                />
+              </div>
+            </div>
 
-              {/* Botones */}
-              <div style={styles.buttonRow}>
-                <button type="button" style={styles.cancelButton}>
-                  Cancelar
-                </button>
-                <button type="submit" style={styles.saveButton}>
-                  Guardar médico
-                </button>
+            <div style={styles.row}>
+              <div style={styles.inputGroup}>
+                <Select
+                  label="Horario de atención"
+                  name="horario"
+                  value={formData.horario}
+                  onChange={handleChange}
+                  options={scheduleOptions}
+                />
               </div>
-            </form>
-          </Card>
-        </div>
+              <div style={styles.inputGroup}>
+                <Select
+                  label="Estado"
+                  name="estado"
+                  value={formData.estado}
+                  onChange={handleChange}
+                  options={statusOptions}
+                />
+              </div>
+            </div>
+
+            {/* Botones */}
+            <div style={styles.buttonRow}>
+              <Button variant="outline" type="button">
+                Cancelar
+              </Button>
+              <Button variant="primary" type="submit">
+                Guardar médico
+              </Button>
+            </div>
+          </form>
+        </Card>
       </div>
-    </div>
+    </MainLayout>
   )
 }
+
 const styles = {
   container: {
-    backgroundColor: '#F2F4F7',
+    backgroundColor: C.grayLight,
     minHeight: '100vh', 
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start', 
-    paddingTop: '3rem', 
-    fontFamily: 'Poppins, sans-serif'
+    paddingTop: '2rem',
+    paddingBottom: '2rem',
+    fontFamily: T.family
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.white,
     padding: '2.5rem',
     borderRadius: '12px',
     boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-    width: '750px',
+    width: '100%',
+    maxWidth: '750px',
     textAlign: 'left'
   },
   title: {
-    color: '#333333',
-    fontWeight: '700',
-    fontSize: '1.5rem',
+    color: C.grayDark,
+    fontWeight: T.weight.bold,
+    fontSize: T.size.h2,
     marginBottom: '0.5rem'
   },
   subtitle: {
-    color: '#828282',
-    fontSize: '0.95rem',
+    color: C.grayMid,
+    fontSize: T.size.base,
     marginBottom: '1.5rem'
   },
   sectionTitle: {
-    color: '#2F80ED',
-    fontWeight: '600',
-    fontSize: '1rem',
+    color: C.medicalBlue,
+    fontWeight: T.weight.semibold,
+    fontSize: T.size.lg,
     marginBottom: '0.5rem',
     marginTop: '1rem'
   },
@@ -262,49 +241,11 @@ const styles = {
     display: 'flex',
     flexDirection: 'column'
   },
-  label: {
-    fontSize: '0.85rem',
-    color: '#4F4F4F',
-    marginBottom: '0.3rem'
-  },
-  input: {
-    padding: '0.8rem',
-    borderRadius: '8px',
-    border: '1px solid #E0E0E0',
-    fontSize: '0.9rem',
-    outline: 'none'
-  },
-  select: {
-    padding: '0.8rem',
-    borderRadius: '8px',
-    border: '1px solid #E0E0E0',
-    fontSize: '0.9rem',
-    outline: 'none',
-    backgroundColor: '#FFFFFF'
-  },
   buttonRow: {
     display: 'flex',
     justifyContent: 'flex-end',
     gap: '1rem',
     marginTop: '1.5rem'
-  },
-  cancelButton: {
-    backgroundColor: '#FFFFFF',
-    color: '#333333',
-    border: '1px solid #E0E0E0',
-    borderRadius: '8px',
-    padding: '0.9rem 1.5rem',
-    cursor: 'pointer',
-    fontWeight: '500'
-  },
-  saveButton: {
-    backgroundColor: '#27AE60',
-    color: '#FFFFFF',
-    border: 'none',
-    borderRadius: '8px',
-    padding: '0.9rem 1.5rem',
-    cursor: 'pointer',
-    fontWeight: '600'
   }
 }
 
